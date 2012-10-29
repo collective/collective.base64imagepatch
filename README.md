@@ -1,0 +1,2 @@
+collective.base64imagepatch
+===========================
