@@ -15,5 +15,17 @@
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
   <!-- -*- extra stuff goes here -*- -->
+  <subscriber
+      zcml:condition="installed zope.lifecycleevent"
+      for="*
+           zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+      handler=".patch_base64_images"
+      />
+      
+  <subscriber
+      for="*
+           zope.app.container.interfaces.IObjectAddedEvent"
+      handler=".patch_base64_images"
+      />
   
 </configure>
