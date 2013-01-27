@@ -2,6 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:five="http://namespaces.zope.org/five"
     xmlns:i18n="http://namespaces.zope.org/i18n"
+    xmlns:zcml="http://namespaces.zope.org/zcml"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     i18n_domain="collective.base64imagepatch">
 
@@ -14,18 +15,22 @@
       description="Installs the collective.base64imagepatch package"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
+      
   <!-- -*- extra stuff goes here -*- -->
+  
   <subscriber
       zcml:condition="installed zope.lifecycleevent"
-      for="*
+      for="Products.CMFCore.interfaces.IContentish
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-      handler=".patch_base64_images"
+      handler=".patch_base64_images_on_modifiy"
       />
       
+  <!--
   <subscriber
-      for="*
+      for="Products.CMFCore.interfaces.IContentish
            zope.app.container.interfaces.IObjectAddedEvent"
-      handler=".patch_base64_images"
+      handler=".patch_base64_images_on_create"
       />
+  -->
   
 </configure>

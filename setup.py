@@ -26,6 +26,8 @@ setup(name='collective.base64imagepatch',
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
+          #'BeautifulSoup', old version
+          'beautifulsoup4',
       ],
       entry_points="""
       # -*- Entry points: -*-
