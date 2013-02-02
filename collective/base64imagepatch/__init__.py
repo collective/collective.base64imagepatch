@@ -7,6 +7,19 @@ from Acquisition import aq_inner
 from zope.component import getMultiAdapter
 from zope.app.component.hooks import getSite
 
+import zope.schema
+import zope.interface
+
+try: 
+    from Products.Archetypes.interfaces.base import IBaseContent
+except: 
+    pass
+
+try:
+    from plone.dexterity.interfaces import IDexterityContent
+except:
+    pass
+    
 import logging
 import base64
 
@@ -40,37 +53,50 @@ def apply_patch_on_install():
         
         
 def patch_object(obj):
-    logger.debug( "patching object " + obj.absolute_url() )   
+    
+    logger.info( "patching object " + obj.absolute_url() )   
     
     container = obj.getParentNode()
+    
     if container.isPrincipiaFolderish:
+        logger.info( "Object Type is " + obj.portal_type)
+        logger.info( "Object Parent is " + container.absolute_url() ) 
         
-        logger.debug( "Object Parent is " + container.absolute_url() )  
-        
-        for field in obj.schema.fields():
-            
-            logger.debug( "Object Field is " + field.getType() )  
-            if field.getType() == "plone.app.textfield.RichText":
-                logger.debug( "object " + obj.title + " is a Dexterity Type" )  
-                field_content = field.raw
-                if "base64" in field_content:
-                    patch(container, obj, field)
-            if field.getType() == "Products.Archetypes.Field.TextField":
-                logger.debug( "object " + obj.title + " has a field: " + field.getName() + " that is a Archetype TextField that could hold html" )
-                field_content = field.getRaw(obj)
-                if "base64" in field_content:
-                    patch(container, obj, field)
+        if IBaseContent.providedBy(obj):
+            # Archetype Object
+            for field in obj.schema.fields():
+                if field.getType() == "Products.Archetypes.Field.TextField":
+                    name = field.getName()
+                    logger.info( "object " + obj.title + " has a field: " + field.getName() + " that is a Archetype TextField that could hold html" )
+                    field_content = field.getRaw(obj)
+                    if "base64" in field_content:
+                        new_content = patch(container, obj, name, field_content)
+                        field.getMutator(obj)(new_content)
+        if IDexterityContent.providedBy(obj):
+            # Dexterity Object
+            pt = obj.getTypeInfo()
+            schema = pt.lookupSchema()
+            for name in zope.schema.getFields(schema).keys():
+                logger.info( "Object Field Name is " + name )
+                logger.info( "Object Field Type is " + str( type( getattr(obj, name) ).__name__ ) ) 
+                
+                if type(getattr(obj, name)).__name__ == "RichTextValue":
+                    logger.info( "object " + obj.title + " is a Dexterity Type" )  
+                    field_content = getattr(obj, name).raw
+                    if "base64" in field_content:
+                        new_content = patch(container, obj, name, field_content)
+                        logger.info("New Content : " + new_content)
+                        getattr(obj, name).__init__(raw = new_content)
     
-    
-def patch(container, obj, field):
+def patch(container, obj, name, content):    
     """ Original Patch for both """
     counter = 0    
-    logger.debug( "patching object: " + obj.absolute_url() +" field: " + field.getName() )
-    soup = BeautifulSoup(field.getRaw(obj))
+    logger.info( "patching object: " + obj.absolute_url() +" field: " + name )
+    soup = BeautifulSoup(content)
     all_images = soup.find_all('img')
     
     for item in container.keys():
-        if item.startswith(obj.id + "." + field.getName() + ".image"):
+        if item.startswith(obj.id + "." + name + ".image"):
             counter += 1
     
     for img_tag in all_images:
@@ -79,19 +105,22 @@ def patch(container, obj, field):
             mime_type = image_params[0][5:]
             img_data = image_params[1][7:]
             
-            img_id = obj.id + "." + field.getName() + ".image" + str(counter)
+            img_id = obj.id + "." + name + ".image" + str(counter)
             
-            logger.debug("found img with mime-type: " + mime_type)
+            logger.info("found img with mime-type: " + mime_type)
                 
-            #create File in Container with base-name.image# 
+            #import ipdb; ipdb.set_trace()
+            # create File in Container with base-name.image# 
             container.invokeFactory("Image", id=img_id, mime_type=mime_type, image=base64.b64decode(img_data))
             new_image = container[img_id]
             
             ## set src attribute to new src-location
-            img_tag['src'] = new_image.absolute_url()
+            img_tag['src'] = new_image.absolute_url_path()
             counter += 1
     
-    
     if counter > 0:
-        field.getMutator(obj)(soup.prettify())
+        content = soup.find("body").contents[0].prettify()
+        
+    logger.info("New Content : " + content)
+    return content
     
