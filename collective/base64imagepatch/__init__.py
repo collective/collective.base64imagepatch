@@ -5,7 +5,10 @@ from bs4 import BeautifulSoup
 from Acquisition import aq_inner
 
 from zope.component import getMultiAdapter
-from zope.app.component.hooks import getSite
+try: 
+    from zope.component.hooks import getSite
+except:
+    from zope.app.component.hooks import getSite
 
 import zope.schema
 import zope.interface
@@ -48,6 +51,9 @@ def apply_patch_on_install():
     #get site_root
     portal = getSite()
     
+
+
+
     for obj in all_objects:
         patch_object(obj)
         
@@ -58,7 +64,7 @@ def patch_object(obj):
     
     container = obj.getParentNode()
     
-    if container.isPrincipiaFolderish:
+    if container and container.isPrincipiaFolderish:
         logger.info( "Object Type is " + obj.portal_type)
         logger.info( "Object Parent is " + container.absolute_url() ) 
         
@@ -72,7 +78,8 @@ def patch_object(obj):
                     if "base64" in field_content:
                         new_content = patch(container, obj, name, field_content)
                         field.getMutator(obj)(new_content)
-        if IDexterityContent.providedBy(obj):
+
+        elif IDexterityContent.providedBy(obj):
             # Dexterity Object
             pt = obj.getTypeInfo()
             schema = pt.lookupSchema()
@@ -86,12 +93,15 @@ def patch_object(obj):
                     if "base64" in field_content:
                         new_content = patch(container, obj, name, field_content)
                         logger.info("New Content : " + new_content)
-                        getattr(obj, name).__init__(raw = new_content)
+                        import ipdb; ipdb.set_trace()
+                        #setattr(getattr(obj, name).__init__(raw = new_content)
+        else:
+            logger.info( "Unknown Content-Type-Framework for " + obj.absolute_url() )
     
 def patch(container, obj, name, content):    
     """ Original Patch for both """
     counter = 0    
-    logger.info( "patching object: " + obj.absolute_url() +" field: " + name )
+    logger.info( "patching object: " + obj.absolute_url() + " field: " + name )
     soup = BeautifulSoup(content)
     all_images = soup.find_all('img')
     
