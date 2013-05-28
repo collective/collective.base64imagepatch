@@ -2,6 +2,7 @@
 
 from Acquisition import aq_inner
 from bs4 import BeautifulSoup
+from Products.CMFCore.utils import getToolByName
 from zope.component import getMultiAdapter
 
 import logging
@@ -127,6 +128,33 @@ def patch_object(obj):
             logger.info( "Unknown Content-Type-Framework for " + 
                 obj.absolute_url() 
                 )
+
+def createImage(container, id, mime_type=None, image_data=None):
+    portal = getSite()
+    portal_types = getToolByName(portal, "portal_types")
+    if portal_types.Image.meta_type == "Dexterity FTI":
+        logger.info("Images are \"Dexterity FIT\" Types")
+        from plone.dexterity.utils import createContentInContainer
+
+        item = createContentInContainer(
+            container, 
+            "Image", 
+            title=id, 
+            id=id, 
+            image=image_data
+            )
+
+    elif portal_types.Image.meta_type == "ATBlob":
+        logger.info("Images are \"Archetypes\" Types")
+        container.invokeFactory(
+                "Image", 
+                id=img_id, 
+                mime_type=mime_type, 
+                image=base64.b64decode(img_data))
+    else:
+        logger.info("Unknown Factory or Invocation for Image")
+        logger.info("Image has Meta-Type: " + portal_types.Image.meta_type)
+    import ipdb; ipdb.set_trace()
     
 def patch(container, obj, name, content):    
     """ Original Patch for both """
@@ -155,11 +183,13 @@ def patch(container, obj, name, content):
             logger.info("Found image <img > with mime-type: " + mime_type)
                 
             # create File in Container with base-name.image# 
-            container.invokeFactory(
-                "Image", 
-                id=img_id, 
-                mime_type=mime_type, 
-                image=base64.b64decode(img_data))
+            #container.invokeFactory(
+            #    "Image", 
+            #    id=img_id, 
+            #    mime_type=mime_type, 
+            #    image=base64.b64decode(img_data))
+            createImage(container, img_id, mime_type, base64.b64decode(img_data))
+
             new_image = container[img_id]
 
             ## set src attribute to new src-location
