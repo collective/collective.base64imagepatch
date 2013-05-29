@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from Acquisition import aq_inner
-from bs4 import BeautifulSoup
+from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
 from zope.component import getMultiAdapter
 
@@ -15,6 +15,25 @@ try:
     from zope.component.hooks import getSite
 except:
     from zope.app.component.hooks import getSite
+
+#try:
+#    from bs4 import BeautifulSoup
+#except: 
+#    from BeautifulSoup import BeautifulSoup
+
+try:
+    pkg_resources.get_distribution('beautifulsoup4')
+except pkg_resources.DistributionNotFound:
+    pass
+else:
+    from bs4 import BeautifulSoup
+
+try:
+    pkg_resources.get_distribution('BeautifulSoup')
+except pkg_resources.DistributionNotFound:
+    pass
+else:
+    from BeautifulSoup import BeautifulSoup
 
 try:
     pkg_resources.get_distribution('Products.Archetypes')
@@ -44,13 +63,13 @@ def setuphandler():
 
     """
     
-'''    
+   
 def patch_base64_images_on_create(context, event):
     """ 
     Patch created content if it contains an inline images coded as base64 
     """
     patch_object(context)
-'''
+
     
 def patch_base64_images_on_modifiy(context, event):
     """ 
@@ -66,17 +85,12 @@ def apply_patch_on_install():
     
     #get site_root
     portal = getSite()
-    
-    if HAS_ARCHETYPES:
+    catalog = getToolByName(portal, 'portal_catalog')
 
+    all_objects = catalog(object_provides=IContentish.__identifier__)
 
-        for obj in all_objects:
-            patch_object(obj)
-        
-    if HAS_DEXTERITY:
-
-        for obj in all_objects:
-            patch_object(obj)
+    for obj in all_objects:
+        patch_object(obj)
         
 def patch_object(obj):
     
@@ -130,31 +144,58 @@ def patch_object(obj):
                 )
 
 def createImage(container, id, mime_type=None, image_data=None):
+    # Base assumtion: An Image Type is avaliable
     portal = getSite()
     portal_types = getToolByName(portal, "portal_types")
     if portal_types.Image.meta_type == "Dexterity FTI":
+        # assumtion: plone.app.contenttypes Image 
         logger.info("Images are \"Dexterity FIT\" Types")
-        from plone.dexterity.utils import createContentInContainer
+        #from plone.dexterity.utils import createContentInContainer
+        from plone.namedfile.file import NamedBlobImage 
+        #item = createContentInContainer(
+        #    container, 
+        #    "Image", 
+        #    title=id, 
+        #    id=id, 
+        #    image=image_data
+        #    )
+        #return item
 
-        item = createContentInContainer(
-            container, 
-            "Image", 
-            title=id, 
-            id=id, 
-            image=image_data
-            )
+        container.invokeFactory(
+                "Image",
+                title=id, 
+                id=id)
+        item = container[id]
 
-    elif portal_types.Image.meta_type == "ATBlob":
+        #pt = item.getTypeInfo()
+        #schema = pt.lookupSchema()
+
+        # assumes, that the Image Type has a field image 
+        # that is a NamedBlobImage
+        item.image = NamedBlobImage(
+            data=image_data,
+            contentType=mime_type,
+            filename=id
+        ) 
+
+        return item
+
+    elif portal_types.Image.meta_type == "ATBlob" or 
+        portal_types.Image.meta_type == "ATImage":
+
         logger.info("Images are \"Archetypes\" Types")
         container.invokeFactory(
                 "Image", 
-                id=img_id, 
+                id=id, 
+                title=id,
                 mime_type=mime_type, 
                 image=base64.b64decode(img_data))
+        return container[id]
+
     else:
-        logger.info("Unknown Factory or Invocation for Image")
-        logger.info("Image has Meta-Type: " + portal_types.Image.meta_type)
-    import ipdb; ipdb.set_trace()
+        logger.warn("Unknown Factory or Invocation for Image")
+        logger.warn("Image has Meta-Type: " + portal_types.Image.meta_type)
+    return None
     
 def patch(container, obj, name, content):    
     """ Original Patch for both """
@@ -188,9 +229,11 @@ def patch(container, obj, name, content):
             #    id=img_id, 
             #    mime_type=mime_type, 
             #    image=base64.b64decode(img_data))
-            createImage(container, img_id, mime_type, base64.b64decode(img_data))
-
-            new_image = container[img_id]
+            new_image = createImage(
+                container, 
+                img_id, 
+                mime_type, 
+                base64.b64decode(img_data))
 
             ## set src attribute to new src-location
             ## new_image.relative_url_path() includes Portal-Name
