@@ -26,9 +26,18 @@ setup(name='collective.base64imagepatch',
       install_requires=[
           'setuptools',
           # -*- Extra requirements: -*-
-          #'BeautifulSoup', old version
-          'beautifulsoup4',
+          #'BeautifulSoup', # old version
+          #'beautifulsoup4', # new version
       ],
+      extras_require={
+          'test': [
+              'plone.app.testing[robot]',
+              'plone.app.robotframework',
+              'Products.ATContentTypes',
+              'Products.contentmigration',
+              'plone.app.contenttypes',
+          ],
+      },
       entry_points="""
       # -*- Entry points: -*-
 
