@@ -1,32 +1,23 @@
 collective.base64imagepatch Installation
 ----------------------------------------
 
-To install collective.base64imagepatch into the global Python environment (or a workingenv),
-using a traditional Zope 2 instance, you can do this:
+Dependencies
+------------
 
-* When you're reading this you have probably already run 
-  ``easy_install collective.base64imagepatch``. Find out how to install setuptools
-  (and EasyInstall) here:
-  http://peak.telecommunity.com/DevCenter/EasyInstall
+There is a hard dependency for one of these BeautifulSoup packages:
+* beautifulsoup4 (new version)
+* BeautifulSoup (old depricated version, but usable if already installed or beautifulsoup4 would cause any version conflicts)
+One of those both packages have to be installed. As zc.buildout did not allow optional requires statements you have to include it into your dependency-list
 
-* If you are using Zope 2.9 (not 2.10), get `pythonproducts`_ and install it 
-  via::
-
-    python setup.py install --home /path/to/instance
-
-into your Zope instance.
-
-* Create a file called ``collective.base64imagepatch-configure.zcml`` in the
-  ``/path/to/instance/etc/package-includes`` directory.  The file
-  should only contain this::
-
-    <include package="collective.base64imagepatch" />
-
-.. _pythonproducts: http://plone.org/products/pythonproducts
+There are two soft dependencies on the underlaying Content-Types-Frameworks of Plone. 
+* Archetypes
+* Dexterity
+None of those must be included seperatly in the buildout, as they are already part of Plone.
 
 
-Alternatively, if you are using zc.buildout and the plone.recipe.zope2instance
-recipe to manage your project, you can do this:
+Installation via zv.buildout
+----------------------------
+If you are using zc.buildout to manage your Zope/Plone Instances, you can do this:
 
 * Add ``collective.base64imagepatch`` to the list of eggs to install, e.g.:
 
@@ -35,18 +26,8 @@ recipe to manage your project, you can do this:
     eggs =
         ...
         collective.base64imagepatch
-       
-* Tell the plone.recipe.zope2instance recipe to install a ZCML slug:
-
-    [instance]
-    recipe = plone.recipe.zope2instance
-    ...
-    zcml =
-        collective.base64imagepatch
+        beautifulsoup4 or BeautifulSoup
       
 * Re-run buildout, e.g. with:
 
     $ ./bin/buildout
-        
-You can skip the ZCML slug if you are going to explicitly include the package
-from another package's configure.zcml file.
