@@ -147,6 +147,7 @@ def createImage(container, id, mime_type=None, image_data=None):
     # Base assumtion: An Image Type is avaliable
     portal = getSite()
     portal_types = getToolByName(portal, "portal_types")
+    
     if portal_types.Image.meta_type == "Dexterity FTI":
         # assumtion: plone.app.contenttypes Image 
         logger.info("Images are \"Dexterity FIT\" Types")
@@ -180,8 +181,8 @@ def createImage(container, id, mime_type=None, image_data=None):
 
         return item
 
-    elif portal_types.Image.meta_type == "ATBlob" or 
-        portal_types.Image.meta_type == "ATImage":
+    elif portal_types.Image.Metatype() == "ATBlob" or \
+        portal_types.Image.Metatype() == "ATImage":
 
         logger.info("Images are \"Archetypes\" Types")
         container.invokeFactory(
@@ -189,7 +190,8 @@ def createImage(container, id, mime_type=None, image_data=None):
                 id=id, 
                 title=id,
                 mime_type=mime_type, 
-                image=base64.b64decode(img_data))
+                image=image_data
+            )
         return container[id]
 
     else:
@@ -201,7 +203,8 @@ def patch(container, obj, name, content):
     """ Original Patch for both """
     counter = 0    
     logger.info( "Patching Object \"" + obj.title + 
-        "\" on path: " + obj.absolute_url() + " field: " + name )
+        "\" \non path: " + obj.absolute_url() + "\nfield: " + name + 
+        "\ncontent length = " + str(len(content)) )
     soup = BeautifulSoup(content)
     all_images = soup.find_all('img')
     suffix_list = []
@@ -215,14 +218,16 @@ def patch(container, obj, name, content):
     counter = max(suffix_list) + 1 if len(suffix_list) > 0 else 0
 
     for img_tag in all_images:
-        if img_tag['src'].startswith('data'):
+        if img_tag.has_key('src') and img_tag['src'].startswith('data'):
             image_params = img_tag['src'].split(';')
             mime_type = image_params[0][len("data:"):]
+            if mime_type == "":
+                mime_type = None
+            else:
+                logger.info("Found image <img > with mime-type: " + str(mime_type))                
             img_data = image_params[1][len("base64,"):]
             img_id = suffix + str(counter)
-            
-            logger.info("Found image <img > with mime-type: " + mime_type)
-                
+               
             # create File in Container with base-name.image# 
             #container.invokeFactory(
             #    "Image", 
