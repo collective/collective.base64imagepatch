@@ -58,11 +58,15 @@ def initialize(context):
     Initializer called when used as a Zope 2 product.
     """
     
-def setuphandler():
+def setupVarious(context):
+    """ 
+        Miscellanous steps import handle
     """
 
-    """
-    
+    if context.readDataFile('collective.base64imagepatch_various.txt') is None:
+        return
+    apply_patch_on_install()
+   
    
 def patch_base64_images_on_create(context, event):
     """ 
@@ -94,7 +98,7 @@ def apply_patch_on_install():
         
 def patch_object(obj):
     
-    logger.info( 
+    logger.debug( 
         "Patching Object \"" + 
         obj.title + 
         "\" on path: " + 
@@ -104,15 +108,15 @@ def patch_object(obj):
     container = obj.getParentNode()
     
     if container and container.isPrincipiaFolderish:
-        logger.info( "Object Type is " + obj.portal_type)
-        logger.info( "Object Parent is " + container.absolute_url() ) 
+        logger.debug( "Object Type is " + obj.portal_type)
+        logger.debug( "Object Parent is " + container.absolute_url() ) 
         
         if HAS_ARCHETYPES and IBaseContent.providedBy(obj):
             # Archetype Object
             for field in obj.schema.fields():
                 if field.getType() == "Products.Archetypes.Field.TextField":
                     name = field.getName()
-                    logger.info( 
+                    logger.debug( 
                         "Object \""+obj.title+"\" is a Archetypes Type"+
                         " that has a field: \"" + field.getName() + 
                         "\" that is a Archetype TextField that could hold HTML" 
@@ -127,19 +131,19 @@ def patch_object(obj):
             pt = obj.getTypeInfo()
             schema = pt.lookupSchema()
             for name in zope.schema.getFields(schema).keys():
-                logger.info( "Object Field Name is " + name )
-                logger.info( "Object Field Type is " + 
+                logger.debug( "Object Field Name is " + name )
+                logger.debug( "Object Field Type is " + 
                     str( type( getattr(obj, name) ).__name__ ) ) 
                 
                 if type(getattr(obj, name)).__name__ == "RichTextValue":
-                    logger.info( "object "+obj.title+" is a Dexterity Type" )  
+                    logger.debug( "object "+obj.title+" is a Dexterity Type" )  
                     field_content = getattr(obj, name).raw
                     if "base64" in field_content:
                         new_content = patch(container, obj, name, field_content)
                         
                         getattr(obj, name).__init__(raw=new_content)
         else:
-            logger.info( "Unknown Content-Type-Framework for " + 
+            logger.debug( "Unknown Content-Type-Framework for " + 
                 obj.absolute_url() 
                 )
 
@@ -147,10 +151,10 @@ def createImage(container, id, mime_type=None, image_data=None):
     # Base assumtion: An Image Type is avaliable
     portal = getSite()
     portal_types = getToolByName(portal, "portal_types")
-    
+    #import ipdb; ipdb.set_trace()
     if portal_types.Image.meta_type == "Dexterity FTI":
         # assumtion: plone.app.contenttypes Image 
-        logger.info("Images are \"Dexterity FIT\" Types")
+        logger.debug("Images are \"Dexterity FIT\" Types")
         #from plone.dexterity.utils import createContentInContainer
         from plone.namedfile.file import NamedBlobImage 
         #item = createContentInContainer(
@@ -184,7 +188,7 @@ def createImage(container, id, mime_type=None, image_data=None):
     elif portal_types.Image.Metatype() == "ATBlob" or \
         portal_types.Image.Metatype() == "ATImage":
 
-        logger.info("Images are \"Archetypes\" Types")
+        logger.debug("Images are \"Archetypes\" Types")
         container.invokeFactory(
                 "Image", 
                 id=id, 
@@ -202,7 +206,7 @@ def createImage(container, id, mime_type=None, image_data=None):
 def patch(container, obj, name, content):    
     """ Original Patch for both """
     counter = 0    
-    logger.info( "Patching Object \"" + obj.title + 
+    logger.debug( "Patching Object \"" + obj.title + 
         "\" \non path: " + obj.absolute_url() + "\nfield: " + name + 
         "\ncontent length = " + str(len(content)) )
     soup = BeautifulSoup(content)
@@ -224,7 +228,7 @@ def patch(container, obj, name, content):
             if mime_type == "":
                 mime_type = None
             else:
-                logger.info("Found image <img > with mime-type: " + str(mime_type))                
+                logger.debug("Found image <img > with mime-type: " + str(mime_type))                
             img_data = image_params[1][len("base64,"):]
             img_id = suffix + str(counter)
                
@@ -250,6 +254,6 @@ def patch(container, obj, name, content):
     if counter > 0:
         content = soup.find("body").contents[0].prettify()
         
-    logger.info("New Content of Object "+obj.absolute_url()+":\n" + content)
+    logger.debug("New Content of Object "+obj.absolute_url()+":\n" + content)
     return content
     

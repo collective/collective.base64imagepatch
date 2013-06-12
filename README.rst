@@ -30,14 +30,19 @@ If you are using zc.buildout to manage your Zope/Plone Instances, you can do thi
 
 * Add ``collective.base64imagepatch`` to the list of eggs to install, e.g.:
 
+::
+
     [buildout]
     ...
     eggs =
         ...
         collective.base64imagepatch
         beautifulsoup4 or BeautifulSoup
+        ...
       
 * Re-run buildout, e.g. with:
+
+::
 
     $ ./bin/buildout
 
