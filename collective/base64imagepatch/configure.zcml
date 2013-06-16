@@ -8,6 +8,7 @@
 
   <five:registerPackage package="." initialize=".initialize" />
 
+  <!--
   <genericsetup:registerProfile
       name="default"
       title="collective.base64imagepatch"
@@ -15,22 +16,20 @@
       description="Installs the collective.base64imagepatch package"
       provides="Products.GenericSetup.interfaces.EXTENSION"
       />
-      
+  --> 
   <!-- -*- extra stuff goes here -*- -->
   
   <subscriber
       zcml:condition="installed zope.lifecycleevent"
       for="Products.CMFCore.interfaces.IContentish
            zope.lifecycleevent.interfaces.IObjectModifiedEvent"
-      handler=".patch_base64_images_on_modifiy"
+      handler=".subscribers.patch_base64_images_on_modifiy"
       />
       
-  <!--
   <subscriber
       for="Products.CMFCore.interfaces.IContentish
            zope.app.container.interfaces.IObjectAddedEvent"
-      handler=".patch_base64_images_on_create"
+      handler=".subscribers.patch_base64_images_on_create"
       />
-  -->
   
 </configure>

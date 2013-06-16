@@ -18,9 +18,12 @@ class TestCase(ptc.PloneTestCase):
 
         @classmethod
         def setUp(cls):
+            pass
+            '''
             fiveconfigure.debug_mode = True
             ztc.installPackage(collective.base64imagepatch)
             fiveconfigure.debug_mode = False
+            '''
 
         @classmethod
         def tearDown(cls):
