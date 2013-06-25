@@ -46,18 +46,14 @@ def patch_object(obj):
 
     #import ipdb; ipdb.set_trace();
     
-    logger.debug( 
-        "Patching Object \"" + 
-        obj.title + 
-        "\" on path: " + 
-        obj.absolute_url() 
-        )   
+    logger.debug("Patching Object \"%s\" on path: %s" , \
+        (obj.title, obj.absolute_url() ) )   
     
     container = obj.getParentNode()
     
     if container and container.isPrincipiaFolderish:
-        logger.debug( "Object Type is " + obj.portal_type)
-        logger.debug( "Object Parent is " + container.absolute_url() ) 
+        logger.debug( "Object Type is %s" , obj.portal_type)
+        logger.debug( "Object Parent is %s" , container.absolute_url() ) 
         
         if HAS_ARCHETYPES and IBaseContent.providedBy(obj):
             # Archetype Object
@@ -65,10 +61,8 @@ def patch_object(obj):
                 if field.getType() == "Products.Archetypes.Field.TextField":
                     name = field.getName()
                     logger.debug( 
-                        "Object \""+obj.title+"\" is a Archetypes Type"+
-                        " that has a field: \"" + field.getName() + 
-                        "\" that is a Archetype TextField that could hold HTML" 
-                        )
+                        "Object \"%s\" is a Archetypes Type that has a field: \"%s\" that is a Archetype TextField that could hold HTML" , 
+                        (obj.title, field.getName()) )
                     field_content = field.getRaw(obj)
                     if "base64" in field_content:
                         new_content = patch(container, obj, name, field_content)
@@ -79,19 +73,20 @@ def patch_object(obj):
             pt = obj.getTypeInfo()
             schema = pt.lookupSchema()
             for name in zope.schema.getFields(schema).keys():
-                logger.debug( "Object Field Name is " + name )
-                logger.debug( "Object Field Type is " + 
+                logger.debug( "Object Field Name is %s" , name )
+                logger.debug( "Object Field Type is %s" , \
                     str( type( getattr(obj, name) ).__name__ ) ) 
                 
                 if type(getattr(obj, name)).__name__ == "RichTextValue":
-                    logger.debug( "object "+obj.title+" is a Dexterity Type" )  
+                    logger.debug( "object %s is a Dexterity Type" , obj.title )  
                     field_content = getattr(obj, name).raw
                     if "base64" in field_content:
                         new_content = patch(container, obj, name, field_content)
                         
                         getattr(obj, name).__init__(raw=new_content)
         else:
-            logger.debug( "Unknown Content-Type-Framework for " + 
+            logger.debug( 
+                "Unknown Content-Type-Framework for %s" , 
                 obj.absolute_url() 
                 )
 
@@ -101,7 +96,7 @@ def createImage(container, id, mime_type=None, image_data=None):
     # Base assumtion: An Image Type is avaliable
     portal = getSite()
     portal_types = getToolByName(portal, "portal_types")
-    #import ipdb; ipdb.set_trace()
+    
     if portal_types.Image.meta_type == "Dexterity FTI":
         # assumtion: plone.app.contenttypes Image 
         logger.debug("Images are \"Dexterity FIT\" Types")
@@ -150,7 +145,7 @@ def createImage(container, id, mime_type=None, image_data=None):
 
     else:
         logger.warn("Unknown Factory or Invocation for Image")
-        logger.warn("Image has Meta-Type: " + portal_types.Image.meta_type)
+        logger.warn("Image has Meta-Type: %s" , portal_types.Image.meta_type)
     return None
     
 def patch(container, obj, name, content):    
@@ -160,9 +155,10 @@ def patch(container, obj, name, content):
     * Dexterity
     """
     counter = 0    
-    logger.debug( "Patching Object \"" + obj.title + 
-        "\" \non path: " + obj.absolute_url() + "\nfield: " + name + 
-        "\ncontent length = " + str(len(content)) )
+    logger.debug( \
+        "Patching Object \"%s\" on path: %s field: %s content length = %s" , 
+        ( obj.title, obj.absolute_url(), name, str( len(content) ) ) 
+        )
     soup = BeautifulSoup(content)
 
     all_images = soup.find_all('img')
@@ -183,7 +179,10 @@ def patch(container, obj, name, content):
             if mime_type == "":
                 mime_type = None
             else:
-                logger.debug("Found image <img > with mime-type: " + str(mime_type))                
+                logger.debug(
+                    "Found image <img > with mime-type: %s" , 
+                    str(mime_type)
+                    )                
             img_data = image_params[1][len("base64,"):]
             img_id = suffix + str(counter)
                
@@ -210,6 +209,6 @@ def patch(container, obj, name, content):
         content = "".join(str(n) for n in soup.find('body').contents)
 
         
-    logger.info("New Content of Object "+obj.absolute_url()+":\n" + content)
+    logger.info("New Content of Object %s:\n%s" , (obj.absolute_url(), content))
     return content
     
