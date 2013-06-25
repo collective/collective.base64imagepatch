@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import pkg_resources
 
 try:
     pkg_resources.get_distribution('Products.Archetypes')

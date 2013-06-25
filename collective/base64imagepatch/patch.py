@@ -11,10 +11,6 @@ import pkg_resources
 import zope.interface
 import zope.schema
 
-try: 
-    from zope.component.hooks import getSite
-except:
-    from zope.app.component.hooks import getSite
 
 #try:
 #    from bs4 import BeautifulSoup
@@ -168,6 +164,7 @@ def patch(container, obj, name, content):
         "\" \non path: " + obj.absolute_url() + "\nfield: " + name + 
         "\ncontent length = " + str(len(content)) )
     soup = BeautifulSoup(content)
+
     all_images = soup.find_all('img')
     suffix_list = []
     suffix = obj.id + "." + name + ".image"
@@ -210,8 +207,9 @@ def patch(container, obj, name, content):
             counter += 1
     
     if counter > 0:
-        content = soup.find("body").contents[0].prettify()
+        content = "".join(str(n) for n in soup.find('body').contents)
+
         
-    logger.debug("New Content of Object "+obj.absolute_url()+":\n" + content)
+    logger.info("New Content of Object "+obj.absolute_url()+":\n" + content)
     return content
     
