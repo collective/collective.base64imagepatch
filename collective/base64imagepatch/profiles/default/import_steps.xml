@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<import-steps>
-  <import-step id="collective.base64imagepatch.various"
-               version="20130612-01"
-               handler="collective.base64imagepatch.setupVarious"
-               title="base64 Image Patch: miscellaneous import steps">
-    Various import steps that are not handled by GS import/export handlers.
-  </import-step>
-</import-steps>
