@@ -24,7 +24,7 @@ class PatchAllView(BrowserView):
 
         ## call patch method for all content objects
         for obj in all_objects:
-            info = "Patch Object: %s at path: %s\n" , (obj.id, obj.getPath() 
+            info = "Patch Object: %s at path: %s\n" , (obj.id, obj.getPath() )
             self.request.response.write(info)
             self.request.response.flush()
             logger.info(info)
