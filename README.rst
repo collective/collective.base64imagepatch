@@ -67,4 +67,6 @@ Credits
 =======
 
 * Contributers:
-** Alexander Loechel
+
+ * Alexander Loechel
+
