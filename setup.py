@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import os
 
-version = '0.10'
+version = '0.11'
 
 setup(name='collective.base64imagepatch',
       version=version,
@@ -17,7 +17,7 @@ setup(name='collective.base64imagepatch',
       keywords='zope plone base64 image patcher',
       author='Alexander Loechel',
       author_email='Alexander.Loechel@lmu.de',
-      url='http://svn.plone.org/svn/collective/',
+      url='https://github.com/collective/collective.base64imagepatch',
       license='GPL',
       packages=find_packages('src', exclude=['ez_setup']),
       package_dir={'': 'src'},

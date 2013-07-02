@@ -1,10 +1,15 @@
 Changelog
 =========
 
-0.10 (unreleased)
+0.11 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- updated setup.py for Homepage and fixed History
+
+0.10 (2013-07-01)
+-----------------
+
+- Fixed getSite import and interface for zcml dependency on Plone 4.3
 
 
 0.9 (2013-06-25)
