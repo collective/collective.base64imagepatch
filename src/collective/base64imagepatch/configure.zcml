@@ -19,8 +19,9 @@
       />
       
   <subscriber
+      zcml:condition="installed zope.lifecycleevent"
       for="Products.CMFCore.interfaces.IContentish
-           zope.app.container.interfaces.IObjectAddedEvent"
+           zope.lifecycleevent.interfaces.IObjectAddedEvent"
       handler=".subscribers.patch_base64_images_on_create"
       />
 

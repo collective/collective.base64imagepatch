@@ -5,13 +5,17 @@ from Acquisition import aq_inner
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
 from zope.component import getMultiAdapter
+#from zope.site.hooks import getSite
 
 import base64
 import pkg_resources
 import zope.interface
 import zope.schema
 
-
+try: 
+    from zope.component.hooks import getSite
+except:
+    from zope.app.component.hooks import getSite 
 #try:
 #    from bs4 import BeautifulSoup
 #except: 
