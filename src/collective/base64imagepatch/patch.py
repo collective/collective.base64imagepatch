@@ -22,18 +22,18 @@ except:
 #    from BeautifulSoup import BeautifulSoup
 
 try:
-    pkg_resources.get_distribution('beautifulsoup4')
-except pkg_resources.DistributionNotFound:
-    pass
-else:
-    from bs4 import BeautifulSoup
-
-try:
     pkg_resources.get_distribution('BeautifulSoup')
 except pkg_resources.DistributionNotFound:
     pass
 else:
     from BeautifulSoup import BeautifulSoup
+
+try:
+    pkg_resources.get_distribution('beautifulsoup4')
+except pkg_resources.DistributionNotFound:
+    pass
+else:
+    from bs4 import BeautifulSoup
 
 ## inner imports
 from collective.base64imagepatch import logger
@@ -165,7 +165,7 @@ def patch(container, obj, name, content):
         )
     soup = BeautifulSoup(content)
 
-    all_images = soup.find_all('img')
+    all_images = soup('img')
     suffix_list = []
     suffix = obj.id + "." + name + ".image"
     for item in container.keys():
