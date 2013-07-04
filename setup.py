@@ -29,6 +29,7 @@ setup(name='collective.base64imagepatch',
           # -*- Extra requirements: -*-
           #'BeautifulSoup', # old version
           #'beautifulsoup4', # new version
+          'beautifulsoup4',
       ],
       extras_require={
           'test': [
