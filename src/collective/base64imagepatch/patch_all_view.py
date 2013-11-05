@@ -24,24 +24,24 @@ class PatchAllView(BrowserView):
 
         ## call patch method for all content objects
         for obj in all_objects:
-            info = "Patch Object: %s at path: %s\n" , (obj.id, obj.getPath() )
-            self.request.response.write(info)
+            info = "Patch Object: %s at path: %s" % (obj.id, obj.getPath() )
+            self.request.response.write(info + "\n")
             self.request.response.flush()
-            logger.info(info)
+            logger.debug(info)
             patch_object(obj)
 
     def patch_instance(self, portal):
-        info = "Starting patching Plone Instance: %s at path: %s\n" , \
+        info = "Starting patching Plone Instance: %s at path: %s" % \
             (portal.id, portal.absolute_url() )
-        self.request.response.write(info)
+        self.request.response.write(str(info + "\n"))
         self.request.response.flush()
         logger.info(info)
 
         self.apply_patch_on_plone_instance(portal)
 
-        info = "Finished patching Plone Instance: %s at path: %s\n\n" , \
+        info = "Finished patching Plone Instance: %s at path: %s\n" % \
             (portal.id, portal.absolute_url() )
-        self.request.response.write(info)
+        self.request.response.write(info + "\n")
         self.request.response.flush()
         logger.info(info)
 
