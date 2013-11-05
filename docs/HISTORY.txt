@@ -1,6 +1,12 @@
 Changelog
 =========
 
+
+0.12 (2013-11-05)
+-----------------
+
+- update patch_all to fix errors on patch_all view where String Formating has failed due to syntax errors
+
 0.11 (2013-07-04)
 -----------------
 
