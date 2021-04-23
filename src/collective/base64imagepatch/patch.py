@@ -156,7 +156,7 @@ def patch(container, obj, name, content=""):
         )
         base_html_doc = "<html><head></head><body>%s</body></html>" % content
 
-        soup = BeautifulSoup(base_html_doc)
+        soup = BeautifulSoup(base_html_doc, features="lxml")
 
         all_images = soup(src=re.compile("(data:).*(;base64,).*"))
         suffix_list = []
