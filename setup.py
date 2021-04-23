@@ -4,10 +4,10 @@ from setuptools import setup
 import os
 
 
-version = '0.13.dev0'
+version = "0.13.dev0"
 
 setup(
-    name='collective.base64imagepatch',
+    name="collective.base64imagepatch",
     version=version,
     description="",
     long_description=open("README.rst").read()
@@ -19,28 +19,28 @@ setup(
         "Framework :: Plone",
         "Programming Language :: Python",
     ],
-    keywords='zope plone base64 image patcher',
-    author='Alexander Loechel',
-    author_email='Alexander.Loechel@lmu.de',
-    url='https://github.com/collective/collective.base64imagepatch',
-    license='GPL',
-    packages=find_packages('src', exclude=['ez_setup']),
-    package_dir={'': 'src'},
-    namespace_packages=['collective'],
+    keywords="zope plone base64 image patcher",
+    author="Alexander Loechel",
+    author_email="Alexander.Loechel@lmu.de",
+    url="https://github.com/collective/collective.base64imagepatch",
+    license="GPL",
+    packages=find_packages("src", exclude=["ez_setup"]),
+    package_dir={"": "src"},
+    namespace_packages=["collective"],
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'setuptools',
-        'beautifulsoup4',
+        "setuptools",
+        "beautifulsoup4",
     ],
     extras_require={
-        'test': [
-            'Products.PloneTestCase',
-            'plone.app.testing[robot]',
-            'plone.app.robotframework',
-            'Products.ATContentTypes',
-            'Products.contentmigration',
-            'plone.app.contenttypes',
+        "test": [
+            "Products.PloneTestCase",
+            "plone.app.testing[robot]",
+            "plone.app.robotframework",
+            "Products.ATContentTypes",
+            "Products.contentmigration",
+            "plone.app.contenttypes",
         ],
     },
     entry_points="""

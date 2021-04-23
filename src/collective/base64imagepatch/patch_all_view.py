@@ -17,7 +17,7 @@ class PatchAllView(BrowserView):
         Apply patch on all content object on package installation
         """
 
-        catalog = getToolByName(portal, 'portal_catalog')
+        catalog = getToolByName(portal, "portal_catalog")
 
         # query catalog for all content objects that
         # provide IContentish interface

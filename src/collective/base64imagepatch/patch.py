@@ -27,7 +27,7 @@ if HAS_DEXTERITY:
 
 def patch_object(obj):
 
-    logger.debug("Patching Object \"%s\" on path: %s", (obj.title, obj.absolute_url()))
+    logger.debug('Patching Object "%s" on path: %s', (obj.title, obj.absolute_url()))
 
     container = obj.getParentNode()
 
@@ -41,7 +41,7 @@ def patch_object(obj):
                 if field.getType() == "Products.Archetypes.Field.TextField":
                     name = field.getName()
                     logger.debug(
-                        "Object \"%s\" is a Archetypes Type that has a field: \"%s\" that is a Archetype TextField that could hold HTML",
+                        'Object "%s" is a Archetypes Type that has a field: "%s" that is a Archetype TextField that could hold HTML',
                         (obj.title, field.getName()),
                     )
                     field_content = field.getRaw(obj)
@@ -107,7 +107,7 @@ def createImage(container, id, mime_type=None, image_data=None):
         or portal_types.Image.Metatype() == "ATImage"
     ):
 
-        logger.debug("Images are \"Archetypes\" Types")
+        logger.debug('Images are "Archetypes" Types')
         container.invokeFactory(
             "Image", id=id, title=id, mime_type=mime_type, image=image_data
         )
@@ -128,7 +128,7 @@ def patch(container, obj, name, content=""):
     if container is not None:
         counter = 0
         logger.debug(
-            "Patching Object \"%s\" on path: %s field: %s content length = %s",
+            'Patching Object "%s" on path: %s field: %s content length = %s',
             (obj.title, obj.absolute_url(), name, str(len(content))),
         )
         base_html_doc = "<html><head></head><body>%s</body></html>" % content
@@ -148,12 +148,12 @@ def patch(container, obj, name, content=""):
 
         for img_tag in all_images:
             if (
-                hasattr(img_tag, 'src')
-                and img_tag['src'].startswith('data')
-                and 'base64' in img_tag['src']
+                hasattr(img_tag, "src")
+                and img_tag["src"].startswith("data")
+                and "base64" in img_tag["src"]
             ):
 
-                image_params = img_tag['src'].split(';')
+                image_params = img_tag["src"].split(";")
                 mime_type = image_params[0][len("data:") :]
                 if mime_type == "":
                     mime_type = None
@@ -178,11 +178,11 @@ def patch(container, obj, name, content=""):
                 # new_image.relative_url_path() includes Portal-Name
                 # id is correct, as it is directly in the same container as
                 # the modified object
-                img_tag['src'] = new_image.id
+                img_tag["src"] = new_image.id
                 counter += 1
 
         if counter > 0:
-            content = "".join(str(n) for n in soup('body', limit=1)[0].contents)
+            content = "".join(str(n) for n in soup("body", limit=1)[0].contents)
 
         logger.debug("New Content of Object %s:\n%s" % (obj.absolute_url(), content))
     return content

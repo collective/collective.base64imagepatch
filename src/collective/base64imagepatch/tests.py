@@ -18,11 +18,11 @@ class TestCase(ptc.PloneTestCase):
         @classmethod
         def setUp(cls):
             pass
-            '''
+            """
             fiveconfigure.debug_mode = True
             ztc.installPackage(collective.base64imagepatch)
             fiveconfigure.debug_mode = False
-            '''
+            """
 
         @classmethod
         def tearDown(cls):
@@ -50,5 +50,5 @@ def test_suite():
     )
 
 
-if __name__ == '__main__':
-    unittest.main(defaultTest='test_suite')
+if __name__ == "__main__":
+    unittest.main(defaultTest="test_suite")
