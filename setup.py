@@ -31,9 +31,6 @@ setup(
     zip_safe=False,
     install_requires=[
         'setuptools',
-        # -*- Extra requirements: -*-
-        #'BeautifulSoup', # old version
-        #'beautifulsoup4', # new version
         'beautifulsoup4',
     ],
     extras_require={

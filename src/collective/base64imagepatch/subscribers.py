@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-from collective.base64imagepatch import logger
 from collective.base64imagepatch.patch import patch_object
 
 

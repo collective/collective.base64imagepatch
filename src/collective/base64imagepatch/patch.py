@@ -1,19 +1,12 @@
 # -*- coding: utf-8 -*-
 
-## external imports
-from Acquisition import aq_inner
 from bs4 import BeautifulSoup
-
-## inner imports
 from collective.base64imagepatch import HAS_ARCHETYPES
 from collective.base64imagepatch import HAS_DEXTERITY
 from collective.base64imagepatch import logger
-from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
-from zope.component import getMultiAdapter
 
 import base64
-import pkg_resources
 import re
 import zope.interface
 import zope.schema
@@ -21,7 +14,7 @@ import zope.schema
 
 try:
     from zope.component.hooks import getSite
-except:
+except ImportError:
     from zope.app.component.hooks import getSite
 
 
@@ -78,13 +71,13 @@ def patch_object(obj):
 
 
 def createImage(container, id, mime_type=None, image_data=None):
-    ## Base assumtion: An Image Type is avaliable
+    # Base assumption: An Image Type is avaliable
     portal = getSite()
     portal_types = getToolByName(portal, "portal_types")
 
     if portal_types.Image.meta_type == "Dexterity FTI":
-        ## assumtion: plone.app.contenttypes Image
-        logger.debug("Images are \"Dexterity FIT\" Types")
+        # assumption: plone.app.contenttypes Image
+        logger.debug("Images are 'Dexterity FTI' Types")
         # from plone.dexterity.utils import createContentInContainer
         from plone.namedfile.file import NamedBlobImage
 
@@ -103,8 +96,8 @@ def createImage(container, id, mime_type=None, image_data=None):
         # pt = item.getTypeInfo()
         # schema = pt.lookupSchema()
 
-        ## assumes, that the Image Type has a field image
-        ## that is a NamedBlobImage
+        # assumes, that the Image Type has a field image
+        # that is a NamedBlobImage
         item.image = NamedBlobImage(data=image_data, contentType=mime_type, filename=id)
 
         return item
@@ -132,7 +125,7 @@ def patch(container, obj, name, content=""):
     * Archetypes
     * Dexterity
     """
-    if container != None:
+    if container is not None:
         counter = 0
         logger.debug(
             "Patching Object \"%s\" on path: %s field: %s content length = %s",
@@ -181,10 +174,10 @@ def patch(container, obj, name, content=""):
                     container, img_id, mime_type, base64.b64decode(img_data)
                 )
 
-                ## set src attribute to new src-location
-                ## new_image.relative_url_path() includes Portal-Name
-                ## id is correct, as it is directly in the same container as
-                ## the modified object
+                # set src attribute to new src-location
+                # new_image.relative_url_path() includes Portal-Name
+                # id is correct, as it is directly in the same container as
+                # the modified object
                 img_tag['src'] = new_image.id
                 counter += 1
 

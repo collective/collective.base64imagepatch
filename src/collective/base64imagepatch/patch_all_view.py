@@ -19,11 +19,11 @@ class PatchAllView(BrowserView):
 
         catalog = getToolByName(portal, 'portal_catalog')
 
-        ## query catalog for all content objects that
-        ## provide IContentish interface
+        # query catalog for all content objects that
+        # provide IContentish interface
         all_objects = catalog(object_provides=IContentish.__identifier__)
 
-        ## call patch method for all content objects
+        # call patch method for all content objects
         for obj in all_objects:
             info = "Patch Object: %s at path: %s" % (obj.id, obj.getPath())
             self.request.response.write(info + "\n")
