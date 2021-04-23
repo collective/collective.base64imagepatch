@@ -20,6 +20,7 @@ else:
 
 logger = logging.getLogger('patch_base64images')
 
+
 def initialize(context):
     """
     Initializer called when used as a Zope 2 product.

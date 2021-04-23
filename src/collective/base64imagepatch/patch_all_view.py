@@ -12,41 +12,45 @@ class PatchAllView(BrowserView):
     Patch Browser View for all portals
     """
 
-    def apply_patch_on_plone_instance(self,portal):
-        """ 
-        Apply patch on all content object on package installation 
+    def apply_patch_on_plone_instance(self, portal):
         """
-        
+        Apply patch on all content object on package installation
+        """
+
         catalog = getToolByName(portal, 'portal_catalog')
 
-        ## query catalog for all content objects that 
+        ## query catalog for all content objects that
         ## provide IContentish interface
         all_objects = catalog(object_provides=IContentish.__identifier__)
 
         ## call patch method for all content objects
         for obj in all_objects:
-            info = "Patch Object: %s at path: %s" % (obj.id, obj.getPath() )
+            info = "Patch Object: %s at path: %s" % (obj.id, obj.getPath())
             self.request.response.write(info + "\n")
             self.request.response.flush()
             logger.debug(info)
             patch_object(obj)
 
     def patch_instance(self, portal):
-        info = "Starting patching Plone Instance: %s at path: %s" % \
-            (portal.id, portal.absolute_url() )
+        info = "Starting patching Plone Instance: %s at path: %s" % (
+            portal.id,
+            portal.absolute_url(),
+        )
         self.request.response.write(str(info + "\n"))
         self.request.response.flush()
         logger.info(info)
 
         self.apply_patch_on_plone_instance(portal)
 
-        info = "Finished patching Plone Instance: %s at path: %s\n" % \
-            (portal.id, portal.absolute_url() )
+        info = "Finished patching Plone Instance: %s at path: %s\n" % (
+            portal.id,
+            portal.absolute_url(),
+        )
         self.request.response.write(info + "\n")
         self.request.response.flush()
         logger.info(info)
 
-    def search(self,context):
+    def search(self, context):
         for item in context.values():
             if item.meta_type == "Plone Site":
                 self.patch_instance(item)
