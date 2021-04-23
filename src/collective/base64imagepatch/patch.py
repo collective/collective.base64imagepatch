@@ -45,12 +45,19 @@ def patch_object(obj):
                     name = field.getName()
                     logger.debug(
                         'Object "%s" is a Archetypes Type that has a field: "%s" that is a Archetype TextField that could hold HTML',
-                        (obj.title, field.getName()),
+                        (obj.title, name),
                     )
                     field_content = field.getRaw(obj)
                     if "base64" in field_content:
+                        path = "/".join(obj.getPhysicalPath())
+                        logger.debug(
+                            "Found inline image in TextField %s of Archetypes object at %s",
+                            name,
+                            path,
+                        )
                         new_content = patch(container, obj, name, field_content)
                         field.getMutator(obj)(new_content)
+                        logger.info("Created image for Archetypes object at %s", path)
 
         elif HAS_DEXTERITY and IDexterityContent.providedBy(obj):
             # Dexterity Object
@@ -64,10 +71,11 @@ def patch_object(obj):
                         continue
                     field_content = attribute.raw
                     if "base64" in field_content:
+                        path = "/".join(obj.getPhysicalPath())
                         logger.debug(
                             "Found inline image in rich text field %s of Dexterity object at %s",
                             name,
-                            "/".join(obj.getPhysicalPath()),
+                            path,
                         )
                         new_content = patch(container, obj, name, field_content)
                         setattr(
@@ -80,9 +88,7 @@ def patch_object(obj):
                                 encoding=attribute.encoding,
                             ),
                         )
-                        logger.debug(
-                            "Created image for object at %s", obj.absolute_url()
-                        )
+                        logger.info("Created image for Dexterity object at %s", path)
 
         else:
             logger.debug("Unknown Content-Type-Framework for %s", obj.absolute_url())
