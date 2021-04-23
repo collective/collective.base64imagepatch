@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from collective.base64imagepatch import logger
-from collective.base64imagepatch.patch import patch_object  
+from collective.base64imagepatch.patch import patch_object
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
 from Products.Five.browser import BrowserView
+
 
 class PatchAllView(BrowserView):
     """
@@ -69,4 +70,3 @@ class PatchAllView(BrowserView):
         logger.info("Finished Patch All\n\n")
 
         return "Finished Patch All"
-     

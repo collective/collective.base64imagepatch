@@ -3,6 +3,7 @@
 import logging
 import pkg_resources
 
+
 try:
     pkg_resources.get_distribution('Products.Archetypes')
 except pkg_resources.DistributionNotFound:
@@ -24,4 +25,3 @@ def initialize(context):
     Initializer called when used as a Zope 2 product.
     """
     pass
-    

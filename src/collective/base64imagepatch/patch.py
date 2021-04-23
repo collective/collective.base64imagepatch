@@ -3,6 +3,10 @@
 ## external imports
 from Acquisition import aq_inner
 from bs4 import BeautifulSoup
+## inner imports
+from collective.base64imagepatch import HAS_ARCHETYPES
+from collective.base64imagepatch import HAS_DEXTERITY
+from collective.base64imagepatch import logger
 from Products.CMFCore.interfaces import IContentish
 from Products.CMFCore.utils import getToolByName
 from zope.component import getMultiAdapter
@@ -13,15 +17,12 @@ import re
 import zope.interface
 import zope.schema
 
+
 try: 
     from zope.component.hooks import getSite
 except:
     from zope.app.component.hooks import getSite 
 
-## inner imports
-from collective.base64imagepatch import logger
-from collective.base64imagepatch import HAS_ARCHETYPES
-from collective.base64imagepatch import HAS_DEXTERITY
 
 if HAS_ARCHETYPES:
     from Products.Archetypes.interfaces.base import IBaseContent
@@ -203,4 +204,3 @@ def patch(container, obj, name, content=""):
             
         logger.debug("New Content of Object %s:\n%s" % (obj.absolute_url(), content))
     return content
-    
