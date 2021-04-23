@@ -5,11 +5,11 @@ from collective.base64imagepatch import HAS_ARCHETYPES
 from collective.base64imagepatch import HAS_DEXTERITY
 from collective.base64imagepatch import logger
 from Products.CMFCore.utils import getToolByName
+from Products.CMFPlone.utils import safe_unicode
+from zope.schema import getFieldsInOrder
 
 import base64
 import re
-import zope.interface
-import zope.schema
 
 
 try:
@@ -23,6 +23,9 @@ if HAS_ARCHETYPES:
 
 if HAS_DEXTERITY:
     from plone.dexterity.interfaces import IDexterityContent
+    from plone.dexterity.utils import iterSchemata
+    from plone.app.textfield.interfaces import IRichText
+    from plone.app.textfield.value import RichTextValue
 
 
 def patch_object(obj):
@@ -51,21 +54,36 @@ def patch_object(obj):
 
         elif HAS_DEXTERITY and IDexterityContent.providedBy(obj):
             # Dexterity Object
-            pt = obj.getTypeInfo()
-            schema = pt.lookupSchema()
-            for name in zope.schema.getFields(schema).keys():
-                logger.debug("Object Field Name is %s", name)
-                logger.debug(
-                    "Object Field Type is %s", str(type(getattr(obj, name)).__name__)
-                )
-
-                if type(getattr(obj, name)).__name__ == "RichTextValue":
-                    logger.debug("object %s is a Dexterity Type", obj.title)
-                    field_content = getattr(obj, name).raw
+            for schema in iterSchemata(obj):
+                fields = getFieldsInOrder(schema)
+                for name, field in fields:
+                    if not IRichText.providedBy(field):
+                        continue
+                    attribute = getattr(obj, name, None)
+                    if attribute is None:
+                        continue
+                    field_content = attribute.raw
                     if "base64" in field_content:
+                        logger.debug(
+                            "Found inline image in rich text field %s of Dexterity object at %s",
+                            name,
+                            "/".join(obj.getPhysicalPath()),
+                        )
                         new_content = patch(container, obj, name, field_content)
+                        setattr(
+                            obj,
+                            name,
+                            RichTextValue(
+                                raw=new_content,
+                                mimeType=attribute.mimeType,
+                                outputMimeType=attribute.outputMimeType,
+                                encoding=attribute.encoding,
+                            ),
+                        )
+                        logger.debug(
+                            "Created image for object at %s", obj.absolute_url()
+                        )
 
-                        getattr(obj, name).__init__(raw=new_content)
         else:
             logger.debug("Unknown Content-Type-Framework for %s", obj.absolute_url())
 
@@ -98,7 +116,9 @@ def createImage(container, id, mime_type=None, image_data=None):
 
         # assumes, that the Image Type has a field image
         # that is a NamedBlobImage
-        item.image = NamedBlobImage(data=image_data, contentType=mime_type, filename=id)
+        item.image = NamedBlobImage(
+            data=image_data, contentType=mime_type, filename=safe_unicode(id)
+        )
 
         return item
 
@@ -128,8 +148,11 @@ def patch(container, obj, name, content=""):
     if container is not None:
         counter = 0
         logger.debug(
-            'Patching Object "%s" on path: %s field: %s content length = %s',
-            (obj.title, obj.absolute_url(), name, str(len(content))),
+            "Patching Object '%s' on path: %s field: %s content length = %s",
+            obj.title,
+            obj.absolute_url(),
+            name,
+            str(len(content)),
         )
         base_html_doc = "<html><head></head><body>%s</body></html>" % content
 

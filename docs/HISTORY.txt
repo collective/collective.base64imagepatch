@@ -5,7 +5,7 @@ Changelog
 0.13 (unreleased)
 -----------------
 
-- Nothing changed yet.
+- Fixed for Dexterity on Plone 4.3.  [maurits]
 
 
 0.12 (2013-11-05)
