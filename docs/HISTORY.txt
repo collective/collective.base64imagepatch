@@ -5,6 +5,8 @@ Changelog
 0.13 (unreleased)
 -----------------
 
+- When adding image fails, try the parent container once.  [maurits]
+
 - Fixed patch_all to run patch on objects, not brains.  [maurits]
 
 - BeautifulSoup: always use lxml.  [maurits]

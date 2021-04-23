@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from Acquisition import aq_parent
 from bs4 import BeautifulSoup
 from collective.base64imagepatch import HAS_ARCHETYPES
 from collective.base64imagepatch import HAS_DEXTERITY
@@ -125,7 +126,6 @@ def createImage(container, id, mime_type=None, image_data=None):
         item.image = NamedBlobImage(
             data=image_data, contentType=mime_type, filename=safe_unicode(id)
         )
-
         return item
 
     elif (
@@ -145,11 +145,14 @@ def createImage(container, id, mime_type=None, image_data=None):
     return None
 
 
-def patch(container, obj, name, content=""):
+def patch(container, obj, name, content="", tries=2):
     """
     Original Patch for both:
     * Archetypes
     * Dexterity
+
+    With tries=2: if adding an image to the container fails,
+    we do a second try on the parent container.
     """
     if container is not None:
         counter = 0
@@ -199,9 +202,53 @@ def patch(container, obj, name, content=""):
                 #    id=img_id,
                 #    mime_type=mime_type,
                 #    image=base64.b64decode(img_data))
-                new_image = createImage(
-                    container, img_id, mime_type, base64.b64decode(img_data)
-                )
+                try:
+                    new_image = createImage(
+                        container, img_id, mime_type, base64.b64decode(img_data)
+                    )
+                except ValueError as orig_exc:
+                    # Probably: Disallowed subobject type: Image
+                    # We can try the parent container, but we should start over completely then.
+                    # We try this once.
+                    tries -= 1
+                    if tries <= 0:
+                        logger.info("Adding image failed, no more tries left.")
+                        raise
+                    # If an image has already been added, this means there is something
+                    # wrong only with the current image.
+                    if counter:
+                        raise
+                    orig_path = "/".join(container.getPhysicalPath())
+                    logger.debug(
+                        "Got ValueError adding Image %s to container at %s. "
+                        "Trying in parent of this container.",
+                        img_id,
+                        orig_path,
+                    )
+                    try:
+                        content = patch(
+                            aq_parent(container),
+                            obj,
+                            name,
+                            content=content,
+                            tries=tries,
+                        )
+                        logger.info(
+                            "Got ValueError adding Image to container at %s. "
+                            "Successfully added in the parent of this container instead.",
+                            orig_path,
+                        )
+                        return content
+                    except ValueError:
+                        # The second try failed.
+                        logger.exception(
+                            "Got ValueError adding Image %s to container at %s. "
+                            "Trying in parent failed as well.",
+                            image_id,
+                            orig_path,
+                        )
+                        # Raise the original exception.
+                        raise orig_exc
 
                 # set src attribute to new src-location
                 # new_image.relative_url_path() includes Portal-Name
@@ -209,6 +256,9 @@ def patch(container, obj, name, content=""):
                 # the modified object
                 img_tag["src"] = new_image.id
                 counter += 1
+                logger.info(
+                    "Created image at %s" % "/".join(new_image.getPhysicalPath())
+                )
 
         if counter > 0:
             content = "".join(str(n) for n in soup("body", limit=1)[0].contents)
