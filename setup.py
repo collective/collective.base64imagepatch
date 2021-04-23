@@ -33,6 +33,7 @@ setup(name='collective.base64imagepatch',
       ],
       extras_require={
           'test': [
+              'Products.PloneTestCase',
               'plone.app.testing[robot]',
               'plone.app.robotframework',
               'Products.ATContentTypes',
