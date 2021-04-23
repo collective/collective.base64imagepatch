@@ -21,14 +21,15 @@ class PatchAllView(BrowserView):
 
         # query catalog for all content objects that
         # provide IContentish interface
-        all_objects = catalog(object_provides=IContentish.__identifier__)
+        all_brains = catalog(object_provides=IContentish.__identifier__)
 
         # call patch method for all content objects
-        for obj in all_objects:
-            info = "Patch Object: %s at path: %s" % (obj.id, obj.getPath())
+        for brain in all_brains:
+            info = "Patch Object: %s at path: %s" % (brain.id, brain.getPath())
             self.request.response.write(info + "\n")
             self.request.response.flush()
             logger.debug(info)
+            obj = brain.getObject()
             patch_object(obj)
 
     def patch_instance(self, portal):

@@ -5,6 +5,8 @@ Changelog
 0.13 (unreleased)
 -----------------
 
+- Fixed patch_all to run patch on objects, not brains.  [maurits]
+
 - BeautifulSoup: always use lxml.  [maurits]
 
 - Fixed for Dexterity on Plone 4.3.  [maurits]
