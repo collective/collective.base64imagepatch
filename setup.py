@@ -7,7 +7,7 @@ with open("README.rst") as myfile:
 with open("CHANGES.rst") as myfile:
     changes = myfile.read()
 
-version = "0.13.dev0"
+version = "0.13"
 
 setup(
     name="collective.base64imagepatch",

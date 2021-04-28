@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-0.13 (unreleased)
+0.13 (2021-04-28)
 -----------------
 
 - When adding image fails, try the parent container once.  [maurits]
