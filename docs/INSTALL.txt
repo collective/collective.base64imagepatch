@@ -4,7 +4,7 @@ collective.base64imagepatch Installation
 Dependencies
 ------------
 
-There are two soft dependencies on the underlaying Content-Types-Frameworks of Plone. 
+There are two soft dependencies on the underlaying Content-Types-Frameworks of Plone.
 * Archetypes
 * Dexterity
 None of those must be included seperatly in the buildout, as they are already part of Plone.
@@ -21,7 +21,7 @@ If you are using zc.buildout to manage your Zope/Plone Instances, you can do thi
     eggs =
         ...
         collective.base64imagepatch
-      
+
 * Re-run buildout, e.g. with:
 
     $ ./bin/buildout
