@@ -12,13 +12,16 @@ version = "0.13.dev0"
 setup(
     name="collective.base64imagepatch",
     version=version,
-    description="",
+    description="Turn inline images in rich text into actual image objects",
     long_description=readme + "\n" + changes,
-    # Get more strings from
-    # http://pypi.python.org/pypi?:action=list_classifiers
+    # Get more strings from https://pypi.org/classifiers
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Plone",
+        "Framework :: Plone :: 4.3",
+        "License :: OSI Approved :: GNU General Public License (GPL)",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
     ],
     keywords="zope plone base64 image patcher",
     author="Alexander Loechel",
