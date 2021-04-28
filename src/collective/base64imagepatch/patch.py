@@ -244,7 +244,7 @@ def patch(container, obj, name, content="", tries=2):
                         logger.exception(
                             "Got ValueError adding Image %s to container at %s. "
                             "Trying in parent failed as well.",
-                            image_id,
+                            img_id,
                             orig_path,
                         )
                         # Raise the original exception.
