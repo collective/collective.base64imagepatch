@@ -53,8 +53,6 @@ just this Plone Site Instance or any Zope Root Object for all Plone Sites.
 cmf.ManagePortal Permissions required.
 
 
-.. include: ./docs/HISTORY.txt
-
 Credits
 =======
 
