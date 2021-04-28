@@ -2,15 +2,18 @@ from setuptools import find_packages
 from setuptools import setup
 
 
+with open("README.rst") as myfile:
+    readme = myfile.read()
+with open("CHANGES.rst") as myfile:
+    changes = myfile.read()
+
 version = "0.13.dev0"
 
 setup(
     name="collective.base64imagepatch",
     version=version,
     description="",
-    long_description=open("README.rst").read()
-    + "\n"
-    + open("CHANGES.rst").read(),
+    long_description=readme + "\n" + changes,
     # Get more strings from
     # http://pypi.python.org/pypi?:action=list_classifiers
     classifiers=[
