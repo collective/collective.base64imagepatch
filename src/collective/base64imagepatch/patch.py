@@ -70,7 +70,13 @@ def patch_object(obj):
                     attribute = getattr(obj, name, None)
                     if attribute is None:
                         continue
-                    field_content = attribute.raw
+                    # Handle both RichTextValue and str
+                    if hasattr(attribute, 'raw'):
+                        field_content = attribute.raw
+                    elif isinstance(attribute, str):
+                        field_content = attribute
+                    else:
+                        continue
                     if "base64" in field_content:
                         path = "/".join(obj.getPhysicalPath())
                         logger.debug(
@@ -79,16 +85,20 @@ def patch_object(obj):
                             path,
                         )
                         new_content = patch(container, obj, name, field_content)
-                        setattr(
-                            obj,
-                            name,
-                            RichTextValue(
-                                raw=new_content,
-                                mimeType=attribute.mimeType,
-                                outputMimeType=attribute.outputMimeType,
-                                encoding=attribute.encoding,
-                            ),
-                        )
+                        # Only set RichTextValue if attribute is RichTextValue
+                        if hasattr(attribute, 'mimeType') and hasattr(attribute, 'outputMimeType') and hasattr(attribute, 'encoding'):
+                            setattr(
+                                obj,
+                                name,
+                                RichTextValue(
+                                    raw=new_content,
+                                    mimeType=attribute.mimeType,
+                                    outputMimeType=attribute.outputMimeType,
+                                    encoding=attribute.encoding,
+                                ),
+                            )
+                        else:
+                            setattr(obj, name, new_content)
                         logger.info("Created image for Dexterity object at %s", path)
 
         else:

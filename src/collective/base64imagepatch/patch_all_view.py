@@ -26,7 +26,7 @@ class PatchAllView(BrowserView):
         # call patch method for all content objects
         for brain in all_brains:
             info = "Patch Object: %s at path: %s" % (brain.id, brain.getPath())
-            self.request.response.write(info + "\n")
+            self.request.response.write((info + "\n").encode('utf-8'))
             self.request.response.flush()
             logger.debug(info)
             obj = brain.getObject()
@@ -37,7 +37,7 @@ class PatchAllView(BrowserView):
             portal.id,
             portal.absolute_url(),
         )
-        self.request.response.write(str(info + "\n"))
+        self.request.response.write(info.encode('utf-8') + b"\n")
         self.request.response.flush()
         logger.info(info)
 
@@ -47,7 +47,7 @@ class PatchAllView(BrowserView):
             portal.id,
             portal.absolute_url(),
         )
-        self.request.response.write(info + "\n")
+        self.request.response.write(info.encode('utf-8') + b"\n")
         self.request.response.flush()
         logger.info(info)
 
